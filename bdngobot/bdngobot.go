@@ -13,6 +13,7 @@ import (
 	"github.com/yanndr/rpi/controller"
 	"github.com/yanndr/rpi/gpio"
 	"github.com/yanndr/rpi/sensor"
+	"github.com/yanndr/rpi/tts"
 )
 
 func main() {
@@ -54,7 +55,7 @@ func main() {
 
 	ultrasoundSensor = sensor.NewHCSRO4Sensor(bdnConfig.UltraSoundSensor.Trigger, bdnConfig.UltraSoundSensor.Echo)
 	mouvementProcess = process.NewMouvementProcess(motorsController)
-	speechProcess = process.NewSpeechProcess()
+	speechProcess = process.NewSpeechProcess(&tts.Festival{})
 	singProcess = process.NewSingProcess()
 
 	obstacleDetector = process.NewObstacleDetectorProcess(ultrasoundSensor, 30.0, 60.0)
