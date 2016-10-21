@@ -1,0 +1,7 @@
+default:
+	go build
+clean:
+	go clean
+test:
+	go test ./...
+

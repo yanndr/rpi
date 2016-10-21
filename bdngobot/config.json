@@ -1,0 +1,22 @@
+{
+  "MotorController":{
+    "Motor1":{
+      "Pin1":22,
+      "Pin2":27,
+      "SpeedPin":18
+    },
+    "Motor2":{
+      "Pin1":5,
+      "Pin2":6,
+      "SpeedPin":4
+    },
+    "leftCorrection":0,
+    "RightCorrection":0,
+    "MaxSpeed":0.4,
+    "MinSpeed":0.3
+  },
+  "UltraSoundSensor":{
+    "Echo":16,
+    "Trigger":12
+  }
+}
