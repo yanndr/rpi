@@ -5,19 +5,19 @@ import (
 )
 
 type SpeechProcess struct {
-	DistanceAlertChannel chan ObstacleDistance
-	speaker              tts.Speaker
+	baseProcess
+	speaker tts.Speaker
 }
 
 func NewSpeechProcess(speaker tts.Speaker) *SpeechProcess {
 	return &SpeechProcess{
-		DistanceAlertChannel: make(chan ObstacleDistance),
-		speaker:              speaker,
+		baseProcess: baseProcess{channel: make(chan interface{})},
+		speaker:     speaker,
 	}
 }
 
 func (sp *SpeechProcess) Start() {
-	go ObstacleChannelListener(sp.DistanceAlertChannel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
+	go ObstacleChannelListener(sp.channel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
 }
 
 func (sp *SpeechProcess) Stop() {

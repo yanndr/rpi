@@ -2,10 +2,10 @@ package process
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
-	"github.com/yanndr/bdngobot/sensor"
+	"github.com/yanndr/rpi/event"
+	"github.com/yanndr/rpi/sensor"
 )
 
 //ObstacleDistance distance type for the alertChannel
@@ -21,23 +21,25 @@ const (
 
 //ObstacleDetectorProcess process that check the obstacle with an ultrasoundSensor
 type ObstacleDetectorProcess struct {
+	baseProcess
 	ultrasoundSensor sensor.DistanceSensor
 	alertDistance    ObstacleDistance
 	alertChannels    map[string]chan<- ObstacleDistance
 	warningDistance  ObstacleDistance
 	lastAlert        ObstacleDistance
 	ticker           *time.Ticker
+	alerter          event.Alerter
 }
 
-func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alertDistance, warningDistance ObstacleDistance) *ObstacleDetectorProcess {
+func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter event.Alerter, alertDistance, warningDistance ObstacleDistance) *ObstacleDetectorProcess {
 
 	odp := &ObstacleDetectorProcess{
 		ultrasoundSensor: ultrasoundSensor,
-		//alertChannel:     alertChannel,
-		alertDistance:   alertDistance,
-		warningDistance: warningDistance,
-		lastAlert:       None,
-		alertChannels:   make(map[string]chan<- ObstacleDistance),
+		alertDistance:    alertDistance,
+		warningDistance:  warningDistance,
+		lastAlert:        None,
+		alerter:          alerter,
+		baseProcess:      baseProcess{channel: make(chan interface{})},
 	}
 
 	return odp
@@ -57,17 +59,17 @@ func (odp *ObstacleDetectorProcess) Start() {
 
 			if float64(odp.alertDistance) > d {
 				if odp.lastAlert != Close {
-					odp.postAlert(Close)
+					odp.alerter.PostAlert(Close)
 					odp.lastAlert = Close
 				}
 			} else if float64(odp.warningDistance) > d {
 				if odp.lastAlert != Medium {
-					odp.postAlert(Medium)
+					odp.alerter.PostAlert(Medium)
 					odp.lastAlert = Medium
 				}
 			} else {
 				if odp.lastAlert != Far {
-					odp.postAlert(Far)
+					odp.alerter.PostAlert(Far)
 					odp.lastAlert = Far
 				}
 			}
@@ -80,37 +82,9 @@ func (odp *ObstacleDetectorProcess) Start() {
 func (odp *ObstacleDetectorProcess) Stop() {
 	odp.ticker.Stop()
 	time.Sleep(time.Second)
-	odp.closeChannels()
 }
 
-var rwMutex sync.RWMutex
-
-func (odp *ObstacleDetectorProcess) postAlert(data ObstacleDistance) {
-	rwMutex.RLock()
-	defer rwMutex.RUnlock()
-
-	for _, outputChan := range odp.alertChannels {
-		outputChan <- data
-	}
-}
-
-func (odp *ObstacleDetectorProcess) closeChannels() {
-	rwMutex.RLock()
-	defer rwMutex.RUnlock()
-
-	for _, outputChan := range odp.alertChannels {
-		close(outputChan)
-	}
-}
-
-func (odp *ObstacleDetectorProcess) Subscribe(name string, channel chan<- ObstacleDistance) {
-	rwMutex.RLock()
-	defer rwMutex.RUnlock()
-
-	odp.alertChannels[name] = channel
-}
-
-func ObstacleChannelListener(channel chan ObstacleDistance, far, medium, close func()) {
+func ObstacleChannelListener(channel chan interface{}, far, medium, close func()) {
 	for value := range channel {
 		if value == Far {
 			far()

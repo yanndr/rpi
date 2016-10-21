@@ -8,23 +8,23 @@ import (
 const duration = time.Second * 10
 
 type PlayerProcess struct {
-	DistanceAlertChannel chan ObstacleDistance
-	timer                *time.Timer
-	player               media.Player
+	baseProcess
+	timer  *time.Timer
+	player media.Player
 }
 
 func NewPlayerProcess(player media.Player) *PlayerProcess {
 	return &PlayerProcess{
-		DistanceAlertChannel: make(chan ObstacleDistance),
-		timer:                time.NewTimer(duration),
-		player:               player,
+		baseProcess: baseProcess{channel: make(chan interface{})},
+		timer:       time.NewTimer(duration),
+		player:      player,
 	}
 }
 
 func (sp *PlayerProcess) Start() {
 	sp.timer = time.AfterFunc(duration, func() { sp.player.Play(sp.pickFile()) })
 
-	go ObstacleChannelListener(sp.DistanceAlertChannel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
+	go ObstacleChannelListener(sp.channel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
 }
 
 func (sp *PlayerProcess) pickFile() string {

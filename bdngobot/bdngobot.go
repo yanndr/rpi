@@ -11,6 +11,7 @@ import (
 	"github.com/yanndr/rpi/bdngobot/config"
 	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/controller"
+	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/gpio"
 	"github.com/yanndr/rpi/media"
 	"github.com/yanndr/rpi/sensor"
@@ -21,11 +22,8 @@ func main() {
 
 	var motorsController controller.MotorsController
 	var ultrasoundSensor sensor.DistanceSensor
-	var obstacleDetector *process.ObstacleDetectorProcess
-	var speechProcess *process.SpeechProcess
-	var mouvementProcess *process.MouvementProcess
-	var playerProcess *process.PlayerProcess
-	//var err error
+
+	processes := make(map[string]process.Process)
 
 	bdnConfig, err := config.LoadConfig()
 	if err != nil {
@@ -55,20 +53,18 @@ func main() {
 	}
 
 	ultrasoundSensor = sensor.NewHCSRO4Sensor(bdnConfig.UltraSoundSensor.Trigger, bdnConfig.UltraSoundSensor.Echo)
-	mouvementProcess = process.NewMouvementProcess(motorsController)
-	speechProcess = process.NewSpeechProcess(&tts.Festival{})
-	playerProcess = process.NewPlayerProcess(&media.OmxPlayer{})
 
-	obstacleDetector = process.NewObstacleDetectorProcess(ultrasoundSensor, 30.0, 60.0)
+	ed := event.NewEventDispatcher()
 
-	obstacleDetector.Subscribe("mouvement", mouvementProcess.DistanceAlertChannel)
-	obstacleDetector.Subscribe("speak", speechProcess.DistanceAlertChannel)
-	obstacleDetector.Subscribe("sing", playerProcess.DistanceAlertChannel)
+	processes["mouvment"] = process.NewMouvementProcess(motorsController)
+	processes["speech"] = process.NewSpeechProcess(&tts.Festival{})
+	processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
+	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
 
-	obstacleDetector.Start()
-	mouvementProcess.Start()
-	speechProcess.Start()
-	playerProcess.Start()
+	for name, p := range processes {
+		ed.Subscribe(name, p.Channel())
+		p.Start()
+	}
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int
@@ -83,9 +79,7 @@ func main() {
 		}
 	}
 
-	speechProcess.Stop()
-	obstacleDetector.Stop()
-	motorsController.Stop()
-	playerProcess.Stop()
-
+	for _, p := range processes {
+		p.Stop()
+	}
 }

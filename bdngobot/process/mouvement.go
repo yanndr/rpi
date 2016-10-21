@@ -15,20 +15,20 @@ const (
 )
 
 type MouvementProcess struct {
-	DistanceAlertChannel chan ObstacleDistance
-	motorsController     controller.MotorsController
-	mutex                sync.Mutex
+	baseProcess
+	motorsController controller.MotorsController
+	mutex            sync.Mutex
 }
 
 func NewMouvementProcess(motorsController controller.MotorsController) *MouvementProcess {
 	return &MouvementProcess{
-		DistanceAlertChannel: make(chan ObstacleDistance),
-		motorsController:     motorsController,
+		baseProcess:      baseProcess{channel: make(chan interface{})},
+		motorsController: motorsController,
 	}
 }
 
 func (mp *MouvementProcess) Start() {
-	go ObstacleChannelListener(mp.DistanceAlertChannel, mp.farHandler, mp.mediumHandler, mp.closeHandler)
+	go ObstacleChannelListener(mp.channel, mp.farHandler, mp.mediumHandler, mp.closeHandler)
 }
 
 func (mp *MouvementProcess) Stop() {
