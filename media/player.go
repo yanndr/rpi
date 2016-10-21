@@ -1,7 +1,6 @@
 package media
 
 import (
-	"fmt"
 	"log"
 	"os/exec"
 	"sync"
@@ -24,8 +23,7 @@ func (p *OmxPlayer) Play(file string) {
 		cmd := exec.Command("omxplayer", file)
 		err := cmd.Start()
 		if err != nil {
-			log.Fatal(err)
-			fmt.Println(err)
+			log.Println(err)
 		}
 		log.Printf("Waiting for command to finish...")
 		err = cmd.Wait()
