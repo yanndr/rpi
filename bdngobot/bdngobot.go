@@ -12,6 +12,7 @@ import (
 	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/controller"
 	"github.com/yanndr/rpi/gpio"
+	"github.com/yanndr/rpi/media"
 	"github.com/yanndr/rpi/sensor"
 	"github.com/yanndr/rpi/tts"
 )
@@ -23,7 +24,7 @@ func main() {
 	var obstacleDetector *process.ObstacleDetectorProcess
 	var speechProcess *process.SpeechProcess
 	var mouvementProcess *process.MouvementProcess
-	var singProcess *process.SingProcess
+	var playerProcess *process.PlayerProcess
 	//var err error
 
 	bdnConfig, err := config.LoadConfig()
@@ -56,18 +57,18 @@ func main() {
 	ultrasoundSensor = sensor.NewHCSRO4Sensor(bdnConfig.UltraSoundSensor.Trigger, bdnConfig.UltraSoundSensor.Echo)
 	mouvementProcess = process.NewMouvementProcess(motorsController)
 	speechProcess = process.NewSpeechProcess(&tts.Festival{})
-	singProcess = process.NewSingProcess()
+	playerProcess = process.NewPlayerProcess(&media.OmxPlayer{})
 
 	obstacleDetector = process.NewObstacleDetectorProcess(ultrasoundSensor, 30.0, 60.0)
 
 	obstacleDetector.Subscribe("mouvement", mouvementProcess.DistanceAlertChannel)
 	obstacleDetector.Subscribe("speak", speechProcess.DistanceAlertChannel)
-	obstacleDetector.Subscribe("sing", singProcess.DistanceAlertChannel)
+	obstacleDetector.Subscribe("sing", playerProcess.DistanceAlertChannel)
 
 	obstacleDetector.Start()
 	mouvementProcess.Start()
 	speechProcess.Start()
-	singProcess.Start()
+	playerProcess.Start()
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int
@@ -85,5 +86,6 @@ func main() {
 	speechProcess.Stop()
 	obstacleDetector.Stop()
 	motorsController.Stop()
+	playerProcess.Stop()
 
 }

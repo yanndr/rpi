@@ -1,0 +1,35 @@
+package media
+
+import (
+	"fmt"
+	"log"
+	"os/exec"
+	"sync"
+)
+
+type Player interface {
+	Play(file string)
+}
+
+type OmxPlayer struct {
+	paying bool
+	mutex  sync.Mutex
+}
+
+func (p *OmxPlayer) Play(file string) {
+	if !p.paying {
+		p.mutex.Lock()
+		defer p.mutex.Unlock()
+		p.paying = true
+		cmd := exec.Command("omxplayer", file)
+		err := cmd.Start()
+		if err != nil {
+			log.Fatal(err)
+			fmt.Println(err)
+		}
+		log.Printf("Waiting for command to finish...")
+		err = cmd.Wait()
+		log.Printf("Command finished with error: %v", err)
+		p.paying = false
+	}
+}
