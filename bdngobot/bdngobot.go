@@ -10,6 +10,7 @@ import (
 
 	"github.com/yanndr/rpi/bdngobot/config"
 	"github.com/yanndr/rpi/bdngobot/process"
+	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/controller"
 	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/gpio"
@@ -57,7 +58,7 @@ func main() {
 	ed := event.NewEventDispatcher()
 
 	processes["mouvment"] = process.NewMouvementProcess(motorsController)
-	processes["speech"] = process.NewSpeechProcess(&tts.Festival{})
+	processes["speech"] = process.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText())
 	processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
 	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
 

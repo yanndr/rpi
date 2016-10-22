@@ -1,18 +1,21 @@
 package process
 
 import (
+	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/tts"
 )
 
 type SpeechProcess struct {
 	baseProcess
 	speaker tts.Speaker
+	textGen text.TextGenerator
 }
 
-func NewSpeechProcess(speaker tts.Speaker) *SpeechProcess {
+func NewSpeechProcess(speaker tts.Speaker, tg text.TextGenerator) *SpeechProcess {
 	return &SpeechProcess{
 		baseProcess: baseProcess{channel: make(chan interface{})},
 		speaker:     speaker,
+		textGen:     tg,
 	}
 }
 
@@ -25,7 +28,7 @@ func (sp *SpeechProcess) Stop() {
 }
 
 func (sp *SpeechProcess) farHandler() {
-	go sp.speaker.Speak("Yay! everything is fine!")
+	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.Any))
 }
 
 func (sp *SpeechProcess) mediumHandler() {
@@ -33,5 +36,5 @@ func (sp *SpeechProcess) mediumHandler() {
 }
 
 func (sp *SpeechProcess) closeHandler() {
-	go sp.speaker.Speak("Ho no I am stuck")
+	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.Any))
 }
