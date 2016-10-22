@@ -63,6 +63,7 @@ func main() {
 	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
 
 	for name, p := range processes {
+		fmt.Println("start process ", name)
 		ed.Subscribe(name, p.Channel())
 		p.Start()
 	}

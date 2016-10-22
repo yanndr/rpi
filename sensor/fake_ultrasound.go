@@ -3,6 +3,7 @@
 package sensor
 
 import (
+	"math/rand"
 	"time"
 )
 
@@ -26,5 +27,7 @@ func NewHCSRO4Sensor(trigger, echo uint8) *HCSRO4Sensor {
 }
 
 func (sensor *HCSRO4Sensor) Distance() (float64, error) {
-	return 8, nil
+	rand.Seed(time.Now().UTC().UnixNano())
+	return rand.Float64(), nil
+
 }

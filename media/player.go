@@ -20,7 +20,7 @@ func (p *OmxPlayer) Play(file string) {
 		p.mutex.Lock()
 		defer p.mutex.Unlock()
 		p.paying = true
-		cmd := exec.Command("omxplayer", file)
+		cmd := exec.Command("mplayer", file)
 		err := cmd.Start()
 		if err != nil {
 			log.Println(err)

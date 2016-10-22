@@ -47,12 +47,13 @@ func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter 
 
 func (odp *ObstacleDetectorProcess) Start() {
 
+	go ObstacleChannelListener(odp.channel, func() {}, func() {}, func() {})
+	fmt.Println("Obstacle detector process started.")
 	odp.ticker = time.NewTicker(time.Second / 4)
 	go func() {
 		for range odp.ticker.C {
 
 			d, err := odp.ultrasoundSensor.Distance()
-
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -77,11 +78,13 @@ func (odp *ObstacleDetectorProcess) Start() {
 		fmt.Println("Obstacle detector process exited")
 	}()
 	return
+
 }
 
 func (odp *ObstacleDetectorProcess) Stop() {
 	odp.ticker.Stop()
 	time.Sleep(time.Second)
+	fmt.Println("Obstacle detector process stopped.")
 }
 
 func ObstacleChannelListener(channel chan interface{}, far, medium, close func()) {

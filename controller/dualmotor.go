@@ -95,12 +95,22 @@ func (dualMotor *DualMotorController) applySpeed() {
 	rightSpeed := dualMotor.speed * dualMotor.rightBalance * dualMotor.rightCorrection * maxSpeed
 	leftSpeed := dualMotor.speed * dualMotor.leftBalance * dualMotor.leftCorrection * maxSpeed
 
-	if math.Abs(rightSpeed) < dualMotor.minSpeed {
-		rightSpeed = dualMotor.minSpeed
-	}
+	if rightSpeed > 0 {
+		if math.Abs(rightSpeed) < dualMotor.minSpeed {
+			rightSpeed = dualMotor.minSpeed
+		}
 
-	if math.Abs(leftSpeed) < dualMotor.minSpeed {
-		leftSpeed = dualMotor.minSpeed
+		if math.Abs(leftSpeed) < dualMotor.minSpeed {
+			leftSpeed = dualMotor.minSpeed
+		}
+	} else {
+		if math.Abs(rightSpeed) > -dualMotor.minSpeed {
+			rightSpeed = -dualMotor.minSpeed
+		}
+
+		if math.Abs(leftSpeed) > -dualMotor.minSpeed {
+			leftSpeed = -dualMotor.minSpeed
+		}
 	}
 
 	dualMotor.rightMotor.SetSpeed(rightSpeed)

@@ -1,6 +1,7 @@
 package process
 
 import (
+	"fmt"
 	"math/rand"
 	"sync"
 	"time"
@@ -9,7 +10,7 @@ import (
 )
 
 const (
-	cruiseSpeed = 0.5
+	cruiseSpeed = 0.7
 	escapeSpeed = 1.0
 	backSpeed   = 0.3
 )
@@ -29,20 +30,25 @@ func NewMouvementProcess(motorsController controller.MotorsController) *Mouvemen
 
 func (mp *MouvementProcess) Start() {
 	go ObstacleChannelListener(mp.channel, mp.farHandler, mp.mediumHandler, mp.closeHandler)
+	fmt.Println("Mouvment process started.")
 }
 
 func (mp *MouvementProcess) Stop() {
+	mp.motorsController.Stop()
+	fmt.Println("Mouvment process stoped.")
 }
 
 func (mp *MouvementProcess) farHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
+	fmt.Println("Mouvement Far handler")
 	mp.moveStraight(cruiseSpeed)
 }
 
 func (mp *MouvementProcess) mediumHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
+	fmt.Println("Mouvement medium handler")
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	v := r.Intn(1)
@@ -57,6 +63,7 @@ func (mp *MouvementProcess) mediumHandler() {
 func (mp *MouvementProcess) closeHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
+	fmt.Println("Mouvement Close handler")
 	mp.motorsController.Stop()
 	mp.moveStraight(-cruiseSpeed / 2)
 	time.Sleep(time.Second * 1)

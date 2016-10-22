@@ -1,6 +1,7 @@
 package process
 
 import (
+	"fmt"
 	"github.com/yanndr/rpi/media"
 	"time"
 )
@@ -25,14 +26,16 @@ func (sp *PlayerProcess) Start() {
 	sp.timer = time.AfterFunc(duration, func() { sp.player.Play(sp.pickFile()) })
 
 	go ObstacleChannelListener(sp.channel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
+	fmt.Println("Player process started.")
 }
 
 func (sp *PlayerProcess) pickFile() string {
-	return "/home/pi/mp3/ILBB.mp3"
+	return "/home/pi/Music/ILBB.mp3"
 }
 
 func (sp *PlayerProcess) Stop() {
 	sp.timer.Stop()
+	fmt.Println("Player process stopped.")
 }
 
 func (sp *PlayerProcess) farHandler() {
