@@ -4,40 +4,30 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/sensor"
-)
-
-//ObstacleDistance distance type for the alertChannel
-type ObstacleDistance int
-
-//enum for ObstacleDistance
-const (
-	None ObstacleDistance = iota
-	Far
-	Medium
-	Close
 )
 
 //ObstacleDetectorProcess process that check the obstacle with an ultrasoundSensor
 type ObstacleDetectorProcess struct {
 	baseProcess
 	ultrasoundSensor sensor.DistanceSensor
-	alertDistance    ObstacleDistance
-	alertChannels    map[string]chan<- ObstacleDistance
-	warningDistance  ObstacleDistance
-	lastAlert        ObstacleDistance
+	alertDistance    int
+	alertChannels    map[string]chan<- situation.Situation
+	warningDistance  int
+	lastAlert        situation.Situation
 	ticker           *time.Ticker
 	alerter          event.Alerter
 }
 
-func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter event.Alerter, alertDistance, warningDistance ObstacleDistance) *ObstacleDetectorProcess {
+func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter event.Alerter, alertDistance, warningDistance int) *ObstacleDetectorProcess {
 
 	odp := &ObstacleDetectorProcess{
 		ultrasoundSensor: ultrasoundSensor,
 		alertDistance:    alertDistance,
 		warningDistance:  warningDistance,
-		lastAlert:        None,
+		lastAlert:        situation.Any,
 		alerter:          alerter,
 		baseProcess:      baseProcess{channel: make(chan interface{})},
 	}
@@ -59,19 +49,19 @@ func (odp *ObstacleDetectorProcess) Start() {
 			}
 
 			if float64(odp.alertDistance) > d {
-				if odp.lastAlert != Close {
-					odp.alerter.PostAlert(Close)
-					odp.lastAlert = Close
+				if odp.lastAlert != situation.ObstacleClose {
+					odp.alerter.PostAlert(situation.ObstacleClose)
+					odp.lastAlert = situation.ObstacleClose
 				}
 			} else if float64(odp.warningDistance) > d {
-				if odp.lastAlert != Medium {
-					odp.alerter.PostAlert(Medium)
-					odp.lastAlert = Medium
+				if odp.lastAlert != situation.ObstacleMedium {
+					odp.alerter.PostAlert(situation.ObstacleMedium)
+					odp.lastAlert = situation.ObstacleMedium
 				}
 			} else {
-				if odp.lastAlert != Far {
-					odp.alerter.PostAlert(Far)
-					odp.lastAlert = Far
+				if odp.lastAlert != situation.ObstacleFar {
+					odp.alerter.PostAlert(situation.ObstacleFar)
+					odp.lastAlert = situation.ObstacleFar
 				}
 			}
 		}
@@ -89,9 +79,9 @@ func (odp *ObstacleDetectorProcess) Stop() {
 
 func ObstacleChannelListener(channel chan interface{}, far, medium, close func()) {
 	for value := range channel {
-		if value == Far {
+		if value == situation.ObstacleFar {
 			far()
-		} else if value == Medium {
+		} else if value == situation.ObstacleMedium {
 			medium()
 		} else {
 			close()

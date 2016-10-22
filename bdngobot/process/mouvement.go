@@ -6,11 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/yanndr/bdngobot/controller"
+	"github.com/yanndr/rpi/bdngobot/situation"
+	"github.com/yanndr/rpi/controller"
 )
 
 const (
-	cruiseSpeed = 0.7
+	cruiseSpeed = 0.8
 	escapeSpeed = 1.0
 	backSpeed   = 0.3
 )
@@ -29,7 +30,7 @@ func NewMouvementProcess(motorsController controller.MotorsController) *Mouvemen
 }
 
 func (mp *MouvementProcess) Start() {
-	go ObstacleChannelListener(mp.channel, mp.farHandler, mp.mediumHandler, mp.closeHandler)
+	go mp.eventChannelListener()
 	fmt.Println("Mouvment process started.")
 }
 
@@ -54,9 +55,9 @@ func (mp *MouvementProcess) mediumHandler() {
 	v := r.Intn(1)
 
 	if v == 0 {
-		mp.turnLeft(cruiseSpeed / 2)
+		mp.turnLeft(cruiseSpeed - 0.2)
 	} else {
-		mp.turnRight(cruiseSpeed / 2)
+		mp.turnRight(cruiseSpeed - 0.2)
 	}
 }
 
@@ -67,6 +68,10 @@ func (mp *MouvementProcess) closeHandler() {
 	mp.motorsController.Stop()
 	mp.moveStraight(-cruiseSpeed / 2)
 	time.Sleep(time.Second * 1)
+	mp.motorsController.Stop()
+	mp.motorsController.RotateRight()
+	time.Sleep(time.Second * 1)
+	mp.motorsController.Stop()
 }
 
 func (mp *MouvementProcess) moveStraight(speed float64) {
@@ -86,4 +91,25 @@ func (mp *MouvementProcess) turnLeft(speed float64) {
 func (mp *MouvementProcess) turnRight(speed float64) {
 	mp.motorsController.SetSpeed(speed)
 	mp.motorsController.SetBalance(1, 0.6)
+}
+
+// func (mp *MouvementProcess) rotate(speed float64) {
+// 	mp.motorsController.SetSpeed(speed)
+// 	mp.motorsController.RotateRight()
+// 	time.Sleep(time.Second * 1)
+
+// }
+
+func (mp *MouvementProcess) eventChannelListener() {
+	for value := range mp.channel {
+		if value == situation.ObstacleFar {
+			mp.farHandler()
+		} else if value == situation.ObstacleMedium {
+			mp.mediumHandler()
+		} else if value == situation.ObstacleClose {
+			mp.closeHandler()
+		} else {
+			fmt.Println("No handler in Mouvement process for ", value)
+		}
+	}
 }
