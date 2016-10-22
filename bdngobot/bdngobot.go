@@ -58,7 +58,7 @@ func main() {
 	ed := event.NewEventDispatcher()
 
 	processes["mouvment"] = process.NewMouvementProcess(motorsController)
-	processes["speech"] = process.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText())
+	processes["speech"] = process.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText("text.json"))
 	processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
 	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
 

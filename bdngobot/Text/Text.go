@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	. "github.com/ahmetalpbalkan/go-linq"
@@ -26,8 +27,8 @@ const (
 )
 
 type SituationText struct {
-	Text string
-	Mood Mood
+	Text string `json:"text"`
+	Mood Mood   `json:"mood"`
 }
 
 type TextGenerator interface {
@@ -38,19 +39,19 @@ type MemoryText struct {
 	source map[Situation][]SituationText
 }
 
-func NewMemoryText() *MemoryText {
+func NewMemoryText(textFile string) *MemoryText {
 
-	text := SituationText{Text: "I like big but and I cannot lie", Mood: Neutral}
-	text2 := SituationText{Text: "Vive les slips", Mood: Neutral}
 	source := make(map[Situation][]SituationText)
 
-	source[Any] = []SituationText{text, text2}
+	file, _ := os.Open(textFile)
+	decoder := json.NewDecoder(file)
 
-	b, err := json.Marshal(source)
-	if err == nil {
-		s := string(b[:])
-		fmt.Println(s)
+	err := decoder.Decode(&source)
+	if err != nil {
+		fmt.Println("error:", err)
+		return nil
 	}
+
 	return &MemoryText{
 		source: source,
 	}
