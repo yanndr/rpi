@@ -9,25 +9,25 @@ import (
 	. "github.com/ahmetalpbalkan/go-linq"
 )
 
-type Mood int
+type Mood string
 
 const (
-	Neutral Mood = iota
-	Happy
-	Angry
-	Annoyed
-	Scarred
+	Neutral Mood = "Neutral"
+	Happy   Mood = "Happy"
+	Angry   Mood = "Angry"
+	Annoyed Mood = "Annoyed"
+	Scarred Mood = "Scarred"
 )
 
-type Situation int
+type Situation string
 
 const (
-	Any Situation = iota
+	Any Situation = "Any"
 )
 
 type SituationText struct {
-	text string
-	mood Mood
+	Text string
+	Mood Mood
 }
 
 type TextGenerator interface {
@@ -40,8 +40,8 @@ type MemoryText struct {
 
 func NewMemoryText() *MemoryText {
 
-	text := SituationText{text: "I like big but and I cannot lie", mood: Neutral}
-	text2 := SituationText{text: "Vive les slips", mood: Neutral}
+	text := SituationText{Text: "I like big but and I cannot lie", Mood: Neutral}
+	text2 := SituationText{Text: "Vive les slips", Mood: Neutral}
 	source := make(map[Situation][]SituationText)
 
 	source[Any] = []SituationText{text, text2}
@@ -65,9 +65,9 @@ func (t *MemoryText) Text(m Mood, s Situation) string {
 
 	result := []string{}
 	From(ts).Where(func(t interface{}) bool {
-		return t.(SituationText).mood == m
+		return t.(SituationText).Mood == m
 	}).Select(func(t interface{}) interface{} {
-		return t.(SituationText).text
+		return t.(SituationText).Text
 	}).ToSlice(&result)
 
 	l := len(result)
