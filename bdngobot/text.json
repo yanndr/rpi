@@ -2,12 +2,38 @@
     "Any":
     [
         {
-            "Text":"I like big but and I cannot lie",
-            "Mood":"Neutral"
+            "text":"I like big but and I cannot lie",
+            "mood":"Neutral"
         },
         {
-            "Text":"Vive les slips",
-            "Mood":"Neutral"
+            "text":"Vive les slips",
+            "mood":"Neutral"
+        }
+    ],
+    "ObstacleClose":
+    [
+        {
+            "text":"There is something way too close to me.",
+            "mood":"Neutral"
+        },
+        {
+            "text":"There is a lot of crap in my way.",
+            "mood":"Neutral"
+        },
+        {
+            "text":"Could you please put your junk out of my way?.",
+            "mood":"Neutral"
+        }
+    ],
+    "ObstacleMedium":
+    [
+        {
+            "text":"There is something in my way.",
+            "mood":"Neutral"
+        },
+        {
+            "text":"Ho no something is in the way.",
+            "mood":"Neutral"
         }
     ]
 }

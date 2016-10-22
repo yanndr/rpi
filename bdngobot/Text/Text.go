@@ -23,7 +23,9 @@ const (
 type Situation string
 
 const (
-	Any Situation = "Any"
+	Any            Situation = "Any"
+	ObstacleClose  Situation = "ObstacleClose"
+	ObstacleMedium Situation = "ObstacleMedium"
 )
 
 type SituationText struct {

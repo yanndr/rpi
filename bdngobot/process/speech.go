@@ -36,5 +36,5 @@ func (sp *SpeechProcess) mediumHandler() {
 }
 
 func (sp *SpeechProcess) closeHandler() {
-	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.Any))
+	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.ObstacleClose))
 }
