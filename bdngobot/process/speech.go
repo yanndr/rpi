@@ -2,6 +2,8 @@ package process
 
 import (
 	"fmt"
+	"github.com/yanndr/rpi/bdngobot/mood"
+	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/tts"
 )
@@ -26,18 +28,18 @@ func (sp *SpeechProcess) Start() {
 }
 
 func (sp *SpeechProcess) Stop() {
-	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.Any))
+	go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.Any))
 	fmt.Println("Speech process stopped.")
 }
 
 func (sp *SpeechProcess) farHandler() {
-	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.Any))
+	go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.Any))
 }
 
 func (sp *SpeechProcess) mediumHandler() {
-	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.ObstacleMedium))
+	go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.ObstacleMedium))
 }
 
 func (sp *SpeechProcess) closeHandler() {
-	go sp.speaker.Speak(sp.textGen.Text(text.Neutral, text.ObstacleClose))
+	go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.ObstacleClose))
 }

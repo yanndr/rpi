@@ -3,47 +3,24 @@ package text
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/yanndr/rpi/bdngobot/mood"
+	"github.com/yanndr/rpi/bdngobot/situation"
 	"math/rand"
 	"os"
 	"time"
-
-	. "github.com/ahmetalpbalkan/go-linq"
 )
-
-type Mood string
-
-const (
-	Neutral Mood = "Neutral"
-	Happy   Mood = "Happy"
-	Angry   Mood = "Angry"
-	Annoyed Mood = "Annoyed"
-	Scarred Mood = "Scarred"
-)
-
-type Situation string
-
-const (
-	Any            Situation = "Any"
-	ObstacleClose  Situation = "ObstacleClose"
-	ObstacleMedium Situation = "ObstacleMedium"
-)
-
-type SituationText struct {
-	Text string `json:"text"`
-	Mood Mood   `json:"mood"`
-}
 
 type TextGenerator interface {
-	Text(m Mood, s Situation) string
+	Text(m mood.Mood, s situation.Situation) string
 }
 
 type MemoryText struct {
-	source map[Situation][]SituationText
+	source map[situation.Situation]map[mood.Mood][]string
 }
 
 func NewMemoryText(textFile string) *MemoryText {
 
-	source := make(map[Situation][]SituationText)
+	source := make(map[situation.Situation]map[mood.Mood][]string)
 
 	file, _ := os.Open(textFile)
 	decoder := json.NewDecoder(file)
@@ -59,25 +36,20 @@ func NewMemoryText(textFile string) *MemoryText {
 	}
 }
 
-func (t *MemoryText) Text(m Mood, s Situation) string {
+func (t *MemoryText) Text(m mood.Mood, s situation.Situation) string {
 
-	ts, ok := t.source[s]
+	moods, ok := t.source[s]
 	if !ok {
 		return "I have nothing to say."
 	}
 
-	result := []string{}
-	From(ts).Where(func(t interface{}) bool {
-		return t.(SituationText).Mood == m
-	}).Select(func(t interface{}) interface{} {
-		return t.(SituationText).Text
-	}).ToSlice(&result)
+	sentences := moods[m]
 
-	l := len(result)
+	l := len(sentences)
 	if l == 0 {
 		return "I have nothing to say."
 	}
 	rand.Seed(time.Now().UTC().UnixNano())
-	return result[rand.Intn(len(result))]
+	return sentences[rand.Intn(len(sentences))]
 
 }
