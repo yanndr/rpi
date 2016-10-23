@@ -11,7 +11,7 @@ import (
 
 //ObstacleDetectorProcess process that check the obstacle with an ultrasoundSensor
 type ObstacleDetectorProcess struct {
-	baseProcess
+	BaseProcess
 	ultrasoundSensor sensor.DistanceSensor
 	alertDistance    int
 	alertChannels    map[string]chan<- situation.Situation
@@ -29,7 +29,7 @@ func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter 
 		warningDistance:  warningDistance,
 		lastAlert:        situation.Any,
 		alerter:          alerter,
-		baseProcess:      baseProcess{channel: make(chan interface{})},
+		BaseProcess:      BaseProcess{Channel: make(chan interface{})},
 	}
 
 	return odp
@@ -37,7 +37,7 @@ func NewObstacleDetectorProcess(ultrasoundSensor sensor.DistanceSensor, alerter 
 
 func (odp *ObstacleDetectorProcess) Start() {
 
-	go ObstacleChannelListener(odp.channel, func() {}, func() {}, func() {})
+	go ObstacleChannelListener(odp.Channel, func() {}, func() {}, func() {})
 	fmt.Println("Obstacle detector process started.")
 	odp.ticker = time.NewTicker(time.Second / 4)
 	go func() {

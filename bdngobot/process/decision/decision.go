@@ -1,21 +1,24 @@
-package process
+package decision
 
 import (
 	"fmt"
+	"github.com/yanndr/rpi/bdngobot/process"
+	"github.com/yanndr/rpi/bdngobot/process/mouvement"
+	"github.com/yanndr/rpi/bdngobot/process/speech"
 	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/event"
 	"sync"
 )
 
 type DecisionProcess struct {
-	baseProcess
+	process.BaseProcess
 	mutex   sync.Mutex
 	alerter event.Alerter
 }
 
 func NewDecisionProcess(alerter event.Alerter) *DecisionProcess {
 	return &DecisionProcess{
-		baseProcess: baseProcess{channel: make(chan interface{})},
+		BaseProcess: process.BaseProcess{Channel: make(chan interface{})},
 		alerter:     alerter,
 	}
 }
@@ -23,6 +26,8 @@ func NewDecisionProcess(alerter event.Alerter) *DecisionProcess {
 func (p *DecisionProcess) Start() {
 	go p.eventChannelListener()
 	fmt.Println("DecisionProcess process started.")
+	p.alerter.PostAlert(mouvement.Start)
+	p.alerter.PostAlert(speech.Unmute)
 }
 
 func (p *DecisionProcess) Stop() {
@@ -30,15 +35,13 @@ func (p *DecisionProcess) Stop() {
 }
 
 func (p *DecisionProcess) eventChannelListener() {
-	for value := range p.channel {
+	for value := range p.Channel {
 		if value == situation.ObstacleFar {
 			p.farHandler()
 		} else if value == situation.ObstacleMedium {
 			p.mediumHandler()
 		} else if value == situation.ObstacleClose {
 			p.closeHandler()
-		} else {
-			fmt.Println("No handler for ", value)
 		}
 	}
 }

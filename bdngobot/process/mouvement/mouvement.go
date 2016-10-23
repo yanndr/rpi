@@ -1,4 +1,4 @@
-package process
+package mouvement
 
 import (
 	"fmt"
@@ -6,9 +6,19 @@ import (
 	"sync"
 	"time"
 
+	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/controller"
 )
+
+type MouvmentCommand int
+
+const (
+	Stop MouvmentCommand = iota
+	Start
+)
+
+var Started = false
 
 const (
 	cruiseSpeed = 0.8
@@ -17,14 +27,14 @@ const (
 )
 
 type MouvementProcess struct {
-	baseProcess
+	process.BaseProcess
 	motorsController controller.MotorsController
 	mutex            sync.Mutex
 }
 
 func NewMouvementProcess(motorsController controller.MotorsController) *MouvementProcess {
 	return &MouvementProcess{
-		baseProcess:      baseProcess{channel: make(chan interface{})},
+		BaseProcess:      process.BaseProcess{Channel: make(chan interface{})},
 		motorsController: motorsController,
 	}
 }
@@ -101,15 +111,20 @@ func (mp *MouvementProcess) turnRight(speed float64) {
 // }
 
 func (mp *MouvementProcess) eventChannelListener() {
-	for value := range mp.channel {
-		if value == situation.ObstacleFar {
-			mp.farHandler()
-		} else if value == situation.ObstacleMedium {
-			mp.mediumHandler()
-		} else if value == situation.ObstacleClose {
-			mp.closeHandler()
-		} else {
-			fmt.Println("No handler in Mouvement process for ", value)
+	for value := range mp.Channel {
+		if Started {
+			if value == situation.ObstacleFar {
+				mp.farHandler()
+			} else if value == situation.ObstacleMedium {
+				mp.mediumHandler()
+			} else if value == situation.ObstacleClose {
+				mp.closeHandler()
+			} else if value == Stop {
+				Started = false
+			}
+		}
+		if value == Start {
+			Started = true
 		}
 	}
 }

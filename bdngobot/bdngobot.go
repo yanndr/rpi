@@ -10,6 +10,9 @@ import (
 
 	"github.com/yanndr/rpi/bdngobot/config"
 	"github.com/yanndr/rpi/bdngobot/process"
+	"github.com/yanndr/rpi/bdngobot/process/decision"
+	"github.com/yanndr/rpi/bdngobot/process/mouvement"
+	"github.com/yanndr/rpi/bdngobot/process/speech"
 	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/controller"
 	"github.com/yanndr/rpi/event"
@@ -57,14 +60,15 @@ func main() {
 
 	ed := event.NewEventDispatcher()
 
-	processes["mouvment"] = process.NewMouvementProcess(motorsController)
-	processes["speech"] = process.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText("text.json"))
+	processes["mouvment"] = mouvement.NewMouvementProcess(motorsController)
+	processes["speech"] = speech.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText("text.json"))
 	processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
 	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
+	processes["decision"] = decision.NewDecisionProcess(ed)
 
 	for name, p := range processes {
 		fmt.Println("start process ", name)
-		ed.Subscribe(name, p.Channel())
+		ed.Subscribe(name, p.Chan())
 		p.Start()
 	}
 

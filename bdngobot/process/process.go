@@ -3,13 +3,13 @@ package process
 type Process interface {
 	Start()
 	Stop()
-	Channel() chan interface{}
+	Chan() chan interface{}
 }
 
-type baseProcess struct {
-	channel chan interface{}
+type BaseProcess struct {
+	Channel chan interface{}
 }
 
-func (p *baseProcess) Channel() chan interface{} {
-	return p.channel
+func (p *BaseProcess) Chan() chan interface{} {
+	return p.Channel
 }

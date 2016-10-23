@@ -9,14 +9,14 @@ import (
 const duration = time.Second * 10
 
 type PlayerProcess struct {
-	baseProcess
+	BaseProcess
 	timer  *time.Timer
 	player media.Player
 }
 
 func NewPlayerProcess(player media.Player) *PlayerProcess {
 	return &PlayerProcess{
-		baseProcess: baseProcess{channel: make(chan interface{})},
+		BaseProcess: BaseProcess{Channel: make(chan interface{})},
 		timer:       time.NewTimer(duration),
 		player:      player,
 	}
@@ -25,7 +25,7 @@ func NewPlayerProcess(player media.Player) *PlayerProcess {
 func (sp *PlayerProcess) Start() {
 	sp.timer = time.AfterFunc(duration, func() { sp.player.Play(sp.pickFile()) })
 
-	go ObstacleChannelListener(sp.channel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
+	go ObstacleChannelListener(sp.Channel, sp.farHandler, sp.mediumHandler, sp.closeHandler)
 	fmt.Println("Player process started.")
 }
 
