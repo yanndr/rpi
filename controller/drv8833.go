@@ -1,3 +1,5 @@
+// +build linux,arm
+
 package controller
 
 import (
@@ -55,15 +57,11 @@ func (motor *DRV833MotorController) SetSpeed(speed float64) {
 }
 
 func (motor *DRV833MotorController) runForward(speed float64) {
-	// motor.pin1.Low()
-	// motor.pin2.High()
 	pwm.PwmWrite(motor.pinNum1, 0)
 	pwm.PwmWrite(motor.pinNum2, speed)
 }
 
 func (motor *DRV833MotorController) runBackward(speed float64) {
-	//motor.pin1.High()
-	// motor.pin2.Low()
 	pwm.PwmWrite(motor.pinNum2, 0)
 	pwm.PwmWrite(motor.pinNum1, speed)
 }

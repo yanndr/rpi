@@ -6,31 +6,38 @@ import (
 	"fmt"
 )
 
-//SingleMotorController Controller for one motor
-type SingleMotorController interface {
-	SetSpeed(speed float64)
-	Start()
-	Stop()
-}
-
-type L298NMotorController struct {
+type BaseMotorController struct {
 	name string
 }
 
-func (mc *L298NMotorController) SetSpeed(speed float64) {
+type L298NMotorController struct {
+	BaseMotorController
+}
+
+type DRV833MotorController struct {
+	BaseMotorController
+}
+
+func (mc *BaseMotorController) SetSpeed(speed float64) {
 	fmt.Println(mc.name, " setSpeed at ", speed)
 }
 
-func (mc *L298NMotorController) Start() {
+func (mc *BaseMotorController) Start() {
 	fmt.Println(mc.name, " started")
 }
 
-func (mc *L298NMotorController) Stop() {
+func (mc *BaseMotorController) Stop() {
 	fmt.Println(mc.name, " stopped")
 }
 
 func NewL298NMotorController(name string, pin1, pin2, speedPin uint8) *L298NMotorController {
 	motor := new(L298NMotorController)
+	motor.name = name
+	return motor
+}
+
+func NewDRV833MotorController(name string, pin1, pin2 uint8) *DRV833MotorController {
+	motor := new(DRV833MotorController)
 	motor.name = name
 	return motor
 }
