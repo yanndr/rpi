@@ -3,7 +3,7 @@
 package controller
 
 import (
-	"fmt"
+	// "fmt"
 
 	"github.com/stianeikeland/go-rpio"
 	"github.com/yanndr/rpi/pwm"
@@ -35,6 +35,7 @@ func NewDRV833MotorController(name string, pin1, pin2 uint8) *DRV833MotorControl
 
 //SetSpeed Set the speed of the motor
 func (motor *DRV833MotorController) SetSpeed(speed float64) {
+	// fmt.Println("Set Speed")
 	if speed < -1 {
 		speed = -1
 	} else if speed > 1 {
@@ -43,14 +44,14 @@ func (motor *DRV833MotorController) SetSpeed(speed float64) {
 
 	if speed > 0 {
 		motor.runForward(speed)
-		fmt.Println("Forward")
+		// fmt.Println(motor.name, " Forward ", motor.pinNum1, " ", motor.pinNum2)
 	} else if speed < 0 {
 		speed = speed * -1
 		motor.runBackward(speed)
-		fmt.Println("Backward")
+		// fmt.Println("Backward")
 	}
 
-	fmt.Printf("%v speed:%v \n", motor.name, speed)
+	// fmt.Printf("%v speed:%v \n", motor.name, speed)
 
 	motor.speed = speed
 
