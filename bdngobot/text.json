@@ -25,14 +25,18 @@
     {
         "Neutral":[
             "Something is moving and it is really close.",
-            "There is something way too close."
+            "There is something way too close.",
+            "It's too close",
+            "I am going to poo on my bot pant."
         ]
     },
     "MovingMedium":
     {
         "Neutral":[
             "Something is moving.",
-            "Shit! there is something"
+            "Shit! there is something",
+            "Shit!",
+            "Ho no, something is getting closer"
         ]
     },
     "MovingFar":
@@ -40,7 +44,10 @@
         "Neutral":[
             "It's gone now.",
             "Boooo",
-            "Happy halloween!"
+            "Happy halloween!",
+            "I am the only ghost here!",
+            "Bdn bot will rule the world",
+            "Bdn Bot is in the place"
         ]
     }
 }

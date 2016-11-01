@@ -14,8 +14,8 @@ import (
 type MouvmentCommand string
 
 const (
-	Stop  MouvmentCommand = "StartMoving"
-	Start MouvmentCommand = "StopMoving"
+	Stop  MouvmentCommand = "StopMoving"
+	Start MouvmentCommand = "StartMoving"
 )
 
 var Started = false
@@ -120,6 +120,7 @@ func (mp *MouvementProcess) eventChannelListener() {
 			} else if value == situation.ObstacleClose {
 				mp.closeHandler()
 			} else if value == Stop {
+				mp.motorsController.Stop()
 				Started = false
 			}
 		}

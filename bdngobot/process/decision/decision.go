@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-const duration = time.Second * 15
+const duration = time.Second * 10
 
 type DecisionProcess struct {
 	process.BaseProcess
@@ -33,12 +33,6 @@ func (p *DecisionProcess) Start() {
 	fmt.Println("DecisionProcess process started.")
 	// p.alerter.PostAlert(mouvement.Start)
 	p.alerter.PostAlert(speech.Unmute)
-
-	p.timer = time.AfterFunc(duration, func() {
-		p.alerter.PostAlert(mouvement.Start)
-		time.Sleep(time.Second * 7)
-		p.alerter.PostAlert(mouvement.Stop)
-	})
 }
 
 func (p *DecisionProcess) Stop() {
@@ -58,13 +52,20 @@ func (p *DecisionProcess) eventChannelListener() {
 }
 
 func (p *DecisionProcess) farHandler() {
-	p.timer.Reset(duration)
+	p.timer.Stop()
 }
 
 func (p *DecisionProcess) mediumHandler() {
-	p.timer.Reset(duration)
+	p.timer.Stop()
 }
 
 func (p *DecisionProcess) closeHandler() {
-
+	fmt.Println("Decision close handler")
+	p.timer = time.AfterFunc(duration, func() {
+		fmt.Println("Decision close handler timer go")
+		p.alerter.PostAlert(mouvement.Start)
+		p.alerter.PostAlert(situation.ObstacleClose)
+		time.Sleep(time.Second * 7)
+		p.alerter.PostAlert(mouvement.Stop)
+	})
 }
