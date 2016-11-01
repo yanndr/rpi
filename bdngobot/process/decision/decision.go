@@ -8,26 +8,37 @@ import (
 	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/event"
 	"sync"
+	"time"
 )
+
+const duration = time.Second * 15
 
 type DecisionProcess struct {
 	process.BaseProcess
 	mutex   sync.Mutex
 	alerter event.Alerter
+	timer   *time.Timer
 }
 
 func NewDecisionProcess(alerter event.Alerter) *DecisionProcess {
 	return &DecisionProcess{
 		BaseProcess: process.BaseProcess{Channel: make(chan interface{})},
 		alerter:     alerter,
+		timer:       time.NewTimer(duration),
 	}
 }
 
 func (p *DecisionProcess) Start() {
 	go p.eventChannelListener()
 	fmt.Println("DecisionProcess process started.")
-	p.alerter.PostAlert(mouvement.Start)
+	// p.alerter.PostAlert(mouvement.Start)
 	p.alerter.PostAlert(speech.Unmute)
+
+	p.timer = time.AfterFunc(duration, func() {
+		p.alerter.PostAlert(mouvement.Start)
+		time.Sleep(time.Second * 7)
+		p.alerter.PostAlert(mouvement.Stop)
+	})
 }
 
 func (p *DecisionProcess) Stop() {
@@ -47,11 +58,11 @@ func (p *DecisionProcess) eventChannelListener() {
 }
 
 func (p *DecisionProcess) farHandler() {
-
+	p.timer.Reset(duration)
 }
 
 func (p *DecisionProcess) mediumHandler() {
-
+	p.timer.Reset(duration)
 }
 
 func (p *DecisionProcess) closeHandler() {

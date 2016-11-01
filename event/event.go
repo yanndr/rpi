@@ -1,6 +1,7 @@
 package event
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -27,7 +28,7 @@ func NewEventDispatcher() *EventDispatcher {
 func (e *EventDispatcher) PostAlert(data interface{}) {
 	e.mutex.RLock()
 	defer e.mutex.RUnlock()
-
+	fmt.Println("Post Alert ", data)
 	for _, outputChan := range e.eventChannels {
 		outputChan <- data
 	}

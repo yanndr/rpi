@@ -11,11 +11,11 @@ import (
 	"github.com/yanndr/rpi/controller"
 )
 
-type MouvmentCommand int
+type MouvmentCommand string
 
 const (
-	Stop MouvmentCommand = iota
-	Start
+	Stop  MouvmentCommand = "StartMoving"
+	Start MouvmentCommand = "StopMoving"
 )
 
 var Started = false

@@ -1,6 +1,7 @@
 package led
 
 import (
+	// "fmt"
 	"time"
 
 	"github.com/stianeikeland/go-rpio"
@@ -16,10 +17,10 @@ type LedController struct {
 func NewLedController(pins ...uint8) *LedController {
 
 	c := &LedController{}
-
-	i := 0
-	for _, pin := range pins {
-		c.pinNums[i]
+	c.pinNums = make([]uint8, len(pins))
+	c.pins = make([]rpio.Pin, len(pins))
+	for i, pin := range pins {
+		c.pinNums[i] = pin
 		c.pins[i] = rpio.Pin(pin)
 		c.pins[i].Output()
 		c.pins[i].Low()
@@ -31,6 +32,7 @@ func NewLedController(pins ...uint8) *LedController {
 func (c *LedController) SetAllValue(value float64) {
 	for _, pin := range c.pinNums {
 		pwm.PwmWrite(pin, value)
+		// fmt.Println("led set value ", value, " to ", pin)
 	}
 }
 
@@ -42,17 +44,18 @@ func (c *LedController) SetAllOff() {
 	c.SetAllValue(0)
 }
 
-func (c *LedController) BlinkAll(d time.Duration, min,max,inc float64) {
+func (c *LedController) BlinkAll(d time.Duration, min, max, inc float64) {
 
 	c.ticker = time.NewTicker(d)
 	go func() {
 		i := min
-	increase:
-		true
+		increase := true
 		for range c.ticker.C {
-			if i == max && increase{
+			if i >= max && increase {
+				i = max
 				increase = false
-			}else i==min && !increase{
+			} else if i <= min && !increase {
+				i = min
 				increase = true
 			}
 
@@ -61,6 +64,12 @@ func (c *LedController) BlinkAll(d time.Duration, min,max,inc float64) {
 			} else if i > min && !increase {
 				i -= inc
 			}
+			if i < min {
+				i = min
+			} else if i > max {
+				i = max
+			}
+
 			c.SetAllValue(i)
 		}
 	}()

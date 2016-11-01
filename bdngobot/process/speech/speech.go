@@ -10,13 +10,13 @@ import (
 	"github.com/yanndr/rpi/tts"
 )
 
-type speechCommand int
+type speechCommand string
 
 var Muted = true
 
 const (
-	Mute speechCommand = iota
-	Unmute
+	Mute   speechCommand = "Mute"
+	Unmute speechCommand = "UnMute"
 )
 
 type SpeechProcess struct {
@@ -46,18 +46,24 @@ func (sp *SpeechProcess) Stop() {
 func (sp *SpeechProcess) farHandler() {
 	if mouvement.Started {
 		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.Any))
+	} else {
+		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.MovingFar))
 	}
 }
 
 func (sp *SpeechProcess) mediumHandler() {
 	if mouvement.Started {
 		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.ObstacleMedium))
+	} else {
+		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.MovingMedium))
 	}
 }
 
 func (sp *SpeechProcess) closeHandler() {
 	if mouvement.Started {
 		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.ObstacleClose))
+	} else {
+		go sp.speaker.Speak(sp.textGen.Text(mood.Neutral, situation.MovingClose))
 	}
 }
 

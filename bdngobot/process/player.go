@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-const duration = time.Second * 10
+const duration = time.Second * 20
 
 type PlayerProcess struct {
 	BaseProcess
@@ -30,7 +30,7 @@ func (sp *PlayerProcess) Start() {
 }
 
 func (sp *PlayerProcess) pickFile() string {
-	return "/home/pi/Music/ILBB.mp3"
+	return "/home/pi/Music/halloween.mp3"
 }
 
 func (sp *PlayerProcess) Stop() {

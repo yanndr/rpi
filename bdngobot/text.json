@@ -20,5 +20,27 @@
             "There is something in my way.",
             "Ho no something is in the way."
         ]
+    },
+    "MovingClose":
+    {
+        "Neutral":[
+            "Something is moving and it is really close.",
+            "There is something way too close."
+        ]
+    },
+    "MovingMedium":
+    {
+        "Neutral":[
+            "Something is moving.",
+            "Shit! there is something"
+        ]
+    },
+    "MovingFar":
+    {
+        "Neutral":[
+            "It's gone now.",
+            "Boooo",
+            "Happy halloween!"
+        ]
     }
 }

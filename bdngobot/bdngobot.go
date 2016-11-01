@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/yanndr/rpi/bdngobot/config"
 	"github.com/yanndr/rpi/bdngobot/process"
@@ -15,6 +16,7 @@ import (
 	"github.com/yanndr/rpi/bdngobot/process/speech"
 	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/controller"
+	"github.com/yanndr/rpi/controller/led"
 	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/gpio"
 	"github.com/yanndr/rpi/media"
@@ -71,7 +73,11 @@ func main() {
 		p.Start()
 	}
 	processes["decision"] = decision.NewDecisionProcess(ed)
+	ed.Subscribe("decision", processes["decision"].Chan())
 	processes["decision"].Start()
+
+	lc := led.NewLedController(20, 21)
+	lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int
@@ -89,4 +95,5 @@ func main() {
 	for _, p := range processes {
 		p.Stop()
 	}
+	lc.SetAllOff()
 }

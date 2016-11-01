@@ -44,6 +44,7 @@ func (odp *ObstacleDetectorProcess) Start() {
 		for range odp.ticker.C {
 
 			d, err := odp.ultrasoundSensor.Distance()
+			// fmt.Println("distance: ", d)
 			if err != nil {
 				fmt.Println(err)
 			}
