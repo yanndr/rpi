@@ -4,6 +4,8 @@ package controller
 
 import (
 	"fmt"
+
+	"github.com/yanndr/rpi/pwm"
 )
 
 type BaseMotorController struct {
@@ -36,7 +38,7 @@ func NewL298NMotorController(name string, pin1, pin2, speedPin uint8) *L298NMoto
 	return motor
 }
 
-func NewDRV833MotorController(name string, pin1, pin2 uint8) *DRV833MotorController {
+func NewDRV833MotorController(name string, pin1, pin2 uint8, pwmWriter pwm.PwmWriter) *DRV833MotorController {
 	motor := new(DRV833MotorController)
 	motor.name = name
 	return motor

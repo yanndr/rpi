@@ -11,11 +11,12 @@ import (
 
 //L298NMotorController single motor implementation (L298n)
 type L298NMotorController struct {
-	name     string
-	pin1     rpio.Pin
-	pin2     rpio.Pin
-	speedPin uint8
-	speed    float64
+	name      string
+	pin1      rpio.Pin
+	pin2      rpio.Pin
+	speedPin  uint8
+	speed     float64
+	pwmwriter pwm.PwmWriter
 }
 
 //NewL298NMotorController retrun a Motor instance
@@ -50,7 +51,7 @@ func (motor *L298NMotorController) SetSpeed(speed float64) {
 	fmt.Printf("%v speed:%v \n", motor.name, speed)
 
 	motor.speed = speed
-	pwm.PwmWrite(motor.speedPin, speed)
+	motor.pwmwriter.PwmWrite(motor.speedPin, speed)
 }
 
 func (motor *L298NMotorController) runForward() {
@@ -65,10 +66,10 @@ func (motor *L298NMotorController) runBackward() {
 
 //Stop stop the motor
 func (motor *L298NMotorController) Stop() {
-	pwm.PwmWrite(motor.speedPin, 0)
+	motor.pwmwriter.PwmWrite(motor.speedPin, 0)
 }
 
 //Start start the motor
 func (motor *L298NMotorController) Start() {
-	pwm.PwmWrite(motor.speedPin, motor.speed)
+	motor.pwmwriter.PwmWrite(motor.speedPin, motor.speed)
 }

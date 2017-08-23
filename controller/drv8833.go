@@ -3,9 +3,11 @@
 package controller
 
 import (
+
 	// "fmt"
 
-	"github.com/stianeikeland/go-rpio"
+	"log"
+
 	"github.com/yanndr/rpi/pwm"
 )
 
@@ -13,23 +15,17 @@ import (
 type DRV833MotorController struct {
 	name             string
 	pinNum1, pinNum2 uint8
-	pin1             rpio.Pin
-	pin2             rpio.Pin
 	speed            float64
+	pwmWriter        pwm.PwmWriter
 }
 
 //NewDRV833MotorController retrun a Motor instance
-func NewDRV833MotorController(name string, pin1, pin2 uint8) *DRV833MotorController {
+func NewDRV833MotorController(name string, pin1, pin2 uint8, pwmWriter pwm.PwmWriter) *DRV833MotorController {
 	motor := new(DRV833MotorController)
 	motor.name = name
 	motor.pinNum1 = pin1
 	motor.pinNum2 = pin2
-	motor.pin1 = rpio.Pin(pin1)
-	motor.pin2 = rpio.Pin(pin2)
-	motor.pin1.Output()
-	motor.pin2.Output()
-	motor.pin1.Low()
-	motor.pin2.Low()
+	motor.pwmWriter = pwmWriter
 	return motor
 }
 
@@ -58,19 +54,40 @@ func (motor *DRV833MotorController) SetSpeed(speed float64) {
 }
 
 func (motor *DRV833MotorController) runForward(speed float64) {
-	pwm.PwmWrite(motor.pinNum1, 0)
-	pwm.PwmWrite(motor.pinNum2, speed)
+	err := motor.pwmWriter.PwmWrite(motor.pinNum1, 0)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = motor.pwmWriter.PwmWrite(motor.pinNum2, speed)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func (motor *DRV833MotorController) runBackward(speed float64) {
-	pwm.PwmWrite(motor.pinNum2, 0)
-	pwm.PwmWrite(motor.pinNum1, speed)
+	err := motor.pwmWriter.PwmWrite(motor.pinNum2, 0)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = motor.pwmWriter.PwmWrite(motor.pinNum1, speed)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 //Stop stop the motor
 func (motor *DRV833MotorController) Stop() {
-	pwm.PwmWrite(motor.pinNum1, 0)
-	pwm.PwmWrite(motor.pinNum2, 0)
+	err := motor.pwmWriter.PwmWrite(motor.pinNum1, 0)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	err = motor.pwmWriter.PwmWrite(motor.pinNum2, 0)
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 //Start start the motor

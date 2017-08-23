@@ -2,13 +2,14 @@ package decision
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/bdngobot/process/mouvement"
 	"github.com/yanndr/rpi/bdngobot/process/speech"
 	"github.com/yanndr/rpi/bdngobot/situation"
 	"github.com/yanndr/rpi/event"
-	"sync"
-	"time"
 )
 
 const duration = time.Second * 10
@@ -31,7 +32,7 @@ func NewDecisionProcess(alerter event.Alerter) *DecisionProcess {
 func (p *DecisionProcess) Start() {
 	go p.eventChannelListener()
 	fmt.Println("DecisionProcess process started.")
-	// p.alerter.PostAlert(mouvement.Start)
+	p.alerter.PostAlert(mouvement.Start)
 	p.alerter.PostAlert(speech.Unmute)
 }
 

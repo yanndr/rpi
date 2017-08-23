@@ -23,7 +23,7 @@ type dualMotorController struct {
 
 //MotorController Configuration of a motor
 type motorController struct {
-	Pin1, Pin2, SpeedPin uint8
+	Pin1, Pin2 uint8
 }
 
 type ultraSoundSensor struct {

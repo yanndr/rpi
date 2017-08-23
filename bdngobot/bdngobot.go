@@ -7,8 +7,11 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
+	"github.com/yanndr/rpi/pwm"
+
+	"github.com/kidoman/embd"
+	"github.com/kidoman/embd/controller/pca9685"
 	"github.com/yanndr/rpi/bdngobot/config"
 	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/bdngobot/process/decision"
@@ -16,7 +19,6 @@ import (
 	"github.com/yanndr/rpi/bdngobot/process/speech"
 	"github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/controller"
-	"github.com/yanndr/rpi/controller/led"
 	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/gpio"
 	"github.com/yanndr/rpi/media"
@@ -48,9 +50,16 @@ func main() {
 	// Unmap gpio memory when done
 	defer gpio.Close()
 
+	pca := pca9685.New(embd.NewI2CBus(0x1), 0x40)
+	pca.Freq = 60
+
+	defer pca.Close()
+
+	pca9685 := pwm.NewPca9685(pca)
+
 	motorsController, err = controller.NewDualMotorController(
-		controller.NewDRV833MotorController("left motor", bdnConfig.MotorController.Motor1.Pin1, bdnConfig.MotorController.Motor1.Pin2),
-		controller.NewDRV833MotorController("right motor", bdnConfig.MotorController.Motor2.Pin1, bdnConfig.MotorController.Motor2.Pin2),
+		controller.NewDRV833MotorController("left motor", bdnConfig.MotorController.Motor1.Pin1, bdnConfig.MotorController.Motor1.Pin2, pca9685),
+		controller.NewDRV833MotorController("right motor", bdnConfig.MotorController.Motor2.Pin1, bdnConfig.MotorController.Motor2.Pin2, pca9685),
 		bdnConfig.MotorController.LeftCorrection, bdnConfig.MotorController.RightCorrection, bdnConfig.MotorController.MaxSpeed, bdnConfig.MotorController.MinSpeed)
 
 	if err != nil {
@@ -76,8 +85,8 @@ func main() {
 	ed.Subscribe("decision", processes["decision"].Chan())
 	processes["decision"].Start()
 
-	lc := led.NewLedController(20, 21)
-	lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
+	// lc := led.NewLedController(pca9685, 4, 5)
+	// lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int
@@ -95,5 +104,5 @@ func main() {
 	for _, p := range processes {
 		p.Stop()
 	}
-	lc.SetAllOff()
+	// lc.SetAllOff()
 }

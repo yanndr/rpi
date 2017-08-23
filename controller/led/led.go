@@ -9,14 +9,16 @@ import (
 )
 
 type LedController struct {
-	pinNums []uint8
-	pins    []rpio.Pin
-	ticker  *time.Ticker
+	pinNums   []uint8
+	pins      []rpio.Pin
+	ticker    *time.Ticker
+	pwmWriter pwm.PwmWriter
 }
 
-func NewLedController(pins ...uint8) *LedController {
+func NewLedController(pwmWriter pwm.PwmWriter, pins ...uint8) *LedController {
 
 	c := &LedController{}
+	c.pwmWriter = pwmWriter
 	c.pinNums = make([]uint8, len(pins))
 	c.pins = make([]rpio.Pin, len(pins))
 	for i, pin := range pins {
@@ -31,7 +33,7 @@ func NewLedController(pins ...uint8) *LedController {
 
 func (c *LedController) SetAllValue(value float64) {
 	for _, pin := range c.pinNums {
-		pwm.PwmWrite(pin, value)
+		c.pwmWriter.PwmWrite(pin, value)
 		// fmt.Println("led set value ", value, " to ", pin)
 	}
 }

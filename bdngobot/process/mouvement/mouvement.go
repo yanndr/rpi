@@ -21,9 +21,9 @@ const (
 var Started = false
 
 const (
-	cruiseSpeed = 0.8
+	cruiseSpeed = 1.0
 	escapeSpeed = 1.0
-	backSpeed   = 0.3
+	backSpeed   = 0.5
 )
 
 type MouvementProcess struct {

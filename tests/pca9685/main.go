@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/kidoman/embd"
@@ -17,12 +18,40 @@ func main() {
 
 	defer pca.Close()
 
-	for i := 0; i < 4000; i += 50 {
-		setPwm(i, 100, pca)
+	var val int64
+	var err error
+	var chanel int64
+	if len(os.Args) < 3 {
+		val = 50
+		chanel = 1
+	} else {
+		val, err = strconv.ParseInt(os.Args[2], 10, 32)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
+
+		chanel, err = strconv.ParseInt(os.Args[1], 10, 32)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(-1)
+		}
 	}
-	for i := 4000; i > 0; i -= 50 {
-		setPwm(i, 100, pca)
+	err = pca.SetPwm(int(chanel), 0, int(val))
+
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(-1)
 	}
+
+	time.Sleep(time.Second * 5)
+
+	// for i := 0; i < 4000; i += 50 {
+	// 	setPwm(i, 100, pca)
+	// }
+	// for i := 4000; i > 0; i -= 50 {
+	// 	setPwm(i, 100, pca)
+	// }
 
 }
 
