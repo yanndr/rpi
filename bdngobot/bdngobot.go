@@ -7,7 +7,9 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
+	"github.com/yanndr/rpi/controller/led"
 	"github.com/yanndr/rpi/pwm"
 
 	"github.com/kidoman/embd"
@@ -85,8 +87,8 @@ func main() {
 	ed.Subscribe("decision", processes["decision"].Chan())
 	processes["decision"].Start()
 
-	// lc := led.NewLedController(pca9685, 4, 5)
-	// lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
+	lc := led.NewLedController(pca9685, 4, 5, 6, 7, 8, 9, 10, 11)
+	lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int
