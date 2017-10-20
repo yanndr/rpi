@@ -14,7 +14,7 @@ import (
 func main() {
 
 	pca := pca9685.New(embd.NewI2CBus(0x1), 0x40)
-	pca.Freq = 60
+	pca.Freq = 50
 
 	defer pca.Close()
 
@@ -27,12 +27,14 @@ func main() {
 	} else {
 		val, err = strconv.ParseInt(os.Args[2], 10, 32)
 		if err != nil {
+			fmt.Println("Error after val parse")
 			fmt.Println(err)
 			os.Exit(-1)
 		}
 
 		chanel, err = strconv.ParseInt(os.Args[1], 10, 32)
 		if err != nil {
+			fmt.Println("Error at Channel pars")
 			fmt.Println(err)
 			os.Exit(-1)
 		}
@@ -40,6 +42,7 @@ func main() {
 	err = pca.SetPwm(int(chanel), 0, int(val))
 
 	if err != nil {
+		fmt.Println("Error after SetPwm")
 		fmt.Println(err)
 		os.Exit(-1)
 	}
