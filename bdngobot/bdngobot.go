@@ -7,7 +7,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
+	// "time"
 
 	"github.com/yanndr/rpi/controller/led"
 	"github.com/yanndr/rpi/pwm"
@@ -18,14 +18,14 @@ import (
 	"github.com/yanndr/rpi/bdngobot/process"
 	"github.com/yanndr/rpi/bdngobot/process/decision"
 	"github.com/yanndr/rpi/bdngobot/process/mouvement"
-	"github.com/yanndr/rpi/bdngobot/process/speech"
-	"github.com/yanndr/rpi/bdngobot/text"
+	// "github.com/yanndr/rpi/bdngobot/process/speech"
+	// "github.com/yanndr/rpi/bdngobot/text"
 	"github.com/yanndr/rpi/controller"
 	"github.com/yanndr/rpi/event"
 	"github.com/yanndr/rpi/gpio"
-	"github.com/yanndr/rpi/media"
+	// "github.com/yanndr/rpi/media"
 	"github.com/yanndr/rpi/sensor"
-	"github.com/yanndr/rpi/tts"
+	// "github.com/yanndr/rpi/tts"
 )
 
 func main() {
@@ -74,8 +74,8 @@ func main() {
 	ed := event.NewEventDispatcher()
 
 	processes["mouvment"] = mouvement.NewMouvementProcess(motorsController)
-	processes["speech"] = speech.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText("text.json"))
-	processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
+	//processes["speech"] = speech.NewSpeechProcess(&tts.Festival{}, text.NewMemoryText("text.json"))
+	//processes["player"] = process.NewPlayerProcess(&media.OmxPlayer{})
 	processes["obstacle"] = process.NewObstacleDetectorProcess(ultrasoundSensor, ed, 30.0, 60.0)
 
 	for name, p := range processes {
@@ -88,7 +88,8 @@ func main() {
 	processes["decision"].Start()
 
 	lc := led.NewLedController(pca9685, 4, 5, 6, 7, 8, 9, 10, 11)
-	lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
+	//lc.BlinkAll(time.Second/8, 0, 0.8, 0.1)
+	lc.Scanner()
 
 	fmt.Println("Q to kill Bdnbot")
 	var response int

@@ -46,35 +46,37 @@ func (mp *MouvementProcess) Start() {
 
 func (mp *MouvementProcess) Stop() {
 	mp.motorsController.Stop()
-	fmt.Println("Mouvment process stoped.")
+	// fmt.Println("Mouvment process stoped.")
 }
 
 func (mp *MouvementProcess) farHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
-	fmt.Println("Mouvement Far handler")
+	// fmt.Println("Mouvement Far handler")
 	mp.moveStraight(cruiseSpeed)
 }
 
 func (mp *MouvementProcess) mediumHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
-	fmt.Println("Mouvement medium handler")
+	// fmt.Println("Mouvement medium handler")
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 
 	v := r.Intn(1)
 
 	if v == 0 {
 		mp.turnLeft(cruiseSpeed - 0.2)
+		fmt.Println("left")
 	} else {
 		mp.turnRight(cruiseSpeed - 0.2)
+		fmt.Println("right")
 	}
 }
 
 func (mp *MouvementProcess) closeHandler() {
 	mp.mutex.Lock()
 	defer mp.mutex.Unlock()
-	fmt.Println("Mouvement Close handler")
+	// fmt.Println("Mouvement Close handler")
 	mp.motorsController.Stop()
 	mp.moveStraight(-cruiseSpeed / 2)
 	time.Sleep(time.Second * 1)
